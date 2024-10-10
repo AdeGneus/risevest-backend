@@ -40,7 +40,9 @@ export class AuthService {
   ): Promise<{ user: Partial<User>; message: string }> {
     const { email, password } = payload;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await AppDataSource.getRepository(User).findOne({
+      where: { email },
+    });
 
     if (!user || !(await user.isCorrectPassword(password))) {
       throw new UnauthorizedError("Incorrect email or password");
