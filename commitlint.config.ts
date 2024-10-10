@@ -1,4 +1,6 @@
-module.exports = {
+import { UserConfig } from "@commitlint/types";
+
+const Configuration: UserConfig = {
   parserPreset: "conventional-changelog-conventionalcommits",
   extends: ["@commitlint/config-conventional"],
   rules: {
@@ -29,3 +31,5 @@ module.exports = {
     ],
   },
 };
+
+export default Configuration;
