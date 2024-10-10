@@ -2,7 +2,8 @@ import argon from "argon2";
 import AppDataSource from "../datasource";
 import { User } from "../entities/user.entity";
 import { ConflictError } from "../exceptions/conflictError";
-import { IUserSignUpSchema } from "../schemas/user";
+import { UnauthorizedError } from "../exceptions/unauthorizedError";
+import { ILoginSchema, IUserSignUpSchema } from "../schemas/user";
 
 export class AuthService {
   public async createUser(
@@ -32,5 +33,24 @@ export class AuthService {
     delete newUser.deleted_at;
 
     return { user: newUser, message: "User created successfully" };
+  }
+
+  public async loginUser(
+    payload: ILoginSchema,
+  ): Promise<{ user: Partial<User>; message: string }> {
+    const { email, password } = payload;
+
+    const user = await AppDataSource.getRepository(User).findOne({
+      where: { email },
+    });
+
+    if (!user || !(await user.isCorrectPassword(password))) {
+      throw new UnauthorizedError("Incorrect email or password");
+    }
+
+    delete user.password;
+    delete user.deleted_at;
+
+    return { user, message: "Login successful" };
   }
 }

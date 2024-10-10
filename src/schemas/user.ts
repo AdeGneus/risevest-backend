@@ -31,4 +31,10 @@ export const userSignUpSchema = z.object({
   password: passwordSchema,
 });
 
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+});
+
 export type IUserSignUpSchema = z.infer<typeof userSignUpSchema>;
+export type ILoginSchema = z.infer<typeof loginSchema>;
