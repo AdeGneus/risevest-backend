@@ -11,3 +11,8 @@ export const registerUser = asyncHandler(
     createSendToken(user, 201, message, res);
   },
 );
+
+export const loginUser = asyncHandler(async (req: Request, res: Response) => {
+  const { user, message } = await authService.loginUser(req.body);
+  createSendToken(user, 200, message, res);
+});
