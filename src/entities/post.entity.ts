@@ -1,6 +1,7 @@
 import { IsString } from "class-validator";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import ExtendedBaseEntity from "./base.entity";
+import { Comment } from "./comment.entity";
 import { User } from "./user.entity";
 
 @Entity({ name: "post_tbl" })
@@ -11,6 +12,9 @@ class Post extends ExtendedBaseEntity {
 
   @ManyToOne(() => User, (user) => user.posts, { nullable: false })
   user: User;
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
 }
 
 export { Post };
