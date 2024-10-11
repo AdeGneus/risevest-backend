@@ -1,7 +1,8 @@
 import argon from "argon2";
 import { IsEmail, IsString } from "class-validator";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import ExtendedBaseEntity from "./base.entity";
+import { Post } from "./post.entity";
 
 @Entity({ name: "user_tbl" })
 class User extends ExtendedBaseEntity {
@@ -21,9 +22,11 @@ class User extends ExtendedBaseEntity {
   @IsString()
   password: string;
 
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
+
   async isCorrectPassword(candidatePassword: string): Promise<boolean> {
     return argon.verify(this.password, candidatePassword);
   }
 }
-
 export { User };
