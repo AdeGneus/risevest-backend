@@ -2,12 +2,16 @@ import Redis from "ioredis";
 import AppDataSource from "../datasource";
 import { User } from "../entities/user.entity";
 
-const redisClient = new Redis();
-
 export class UserService {
+  private redisClient: Redis;
+
+  constructor(redisClient?: Redis) {
+    this.redisClient = redisClient || new Redis();
+  }
+
   public async getAllUsers(): Promise<User[]> {
     const cacheKey = "all_users";
-    const cachedUsers = await redisClient.get(cacheKey);
+    const cachedUsers = await this.redisClient.get(cacheKey);
 
     if (cachedUsers) {
       return JSON.parse(cachedUsers);
@@ -17,7 +21,7 @@ export class UserService {
       select: ["id", "first_name", "last_name", "email"],
     });
 
-    await redisClient.set(cacheKey, JSON.stringify(users), "EX", 3600);
+    await this.redisClient.set(cacheKey, JSON.stringify(users), "EX", 3600);
     return users;
   }
 }
