@@ -33,7 +33,6 @@ describe("PostService", () => {
     mockPostRepository = {
       save: jest.fn(),
       find: jest.fn(),
-      remove: jest.fn(),
     };
     (AppDataSource.getRepository as jest.Mock).mockImplementation((entity) => {
       if (entity === User) return mockUserRepository;
@@ -81,5 +80,60 @@ describe("PostService", () => {
     await expect(postService.createPost("1", "This is a post")).rejects.toThrow(
       NotFoundError,
     );
+  });
+
+  it("should get posts of a user from cache if available", async () => {
+    const cachedPosts = [{ id: "1", content: "Cached post content" }];
+
+    mockRedisClient.get.mockResolvedValueOnce(JSON.stringify(cachedPosts));
+
+    const result = await postService.getPostsByUserId("1", "1");
+
+    expect(result).toEqual(cachedPosts);
+    expect(mockRedisClient.get).toHaveBeenCalledWith("user_posts:1");
+    expect(mockUserRepository.findOne).not.toHaveBeenCalled();
+    expect(mockPostRepository.find).not.toHaveBeenCalled();
+  });
+
+  it("should get posts of a user from database if not cached and cache the result", async () => {
+    const user = { id: "1", first_name: "John", last_name: "Doe" };
+    const posts = [
+      { id: "1", content: "This is a post", user },
+      { id: "2", content: "Another post", user },
+    ];
+
+    mockRedisClient.get.mockResolvedValueOnce(null);
+    (mockUserRepository.findOne as jest.Mock).mockResolvedValueOnce(user);
+    (mockPostRepository.find as jest.Mock).mockResolvedValueOnce(posts);
+
+    const result = await postService.getPostsByUserId("1", "1");
+
+    expect(result).toEqual(posts);
+    expect(mockRedisClient.get).toHaveBeenCalledWith("user_posts:1");
+    expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+      where: { id: "1" },
+    });
+    expect(mockPostRepository.find).toHaveBeenCalledWith({
+      where: { user: { id: "1" } },
+    });
+    expect(mockRedisClient.set).toHaveBeenCalledWith(
+      "user_posts:1",
+      JSON.stringify(posts),
+      "EX",
+      3600,
+    );
+  });
+
+  it("should throw NotFoundError if user is not found", async () => {
+    mockRedisClient.get.mockResolvedValueOnce(null);
+    (mockUserRepository.findOne as jest.Mock).mockResolvedValueOnce(null);
+
+    await expect(postService.getPostsByUserId("1", "1")).rejects.toThrow(
+      NotFoundError,
+    );
+    expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+      where: { id: "1" },
+    });
+    expect(mockPostRepository.find).not.toHaveBeenCalled();
   });
 });

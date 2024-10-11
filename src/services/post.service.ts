@@ -37,4 +37,37 @@ export class PostService {
 
     return savedPost;
   }
+
+  public async getPostsByUserId(
+    paramUserId: string,
+    currentUserId: string,
+  ): Promise<Post[]> {
+    const userId = paramUserId === "me" ? currentUserId : paramUserId;
+
+    const cachedPosts = await this.redisClient.get(`user_posts:${userId}`);
+    if (cachedPosts) {
+      return JSON.parse(cachedPosts);
+    }
+
+    const user = await AppDataSource.getRepository(User).findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    const posts = await AppDataSource.getRepository(Post).find({
+      where: { user: { id: userId } },
+    });
+
+    await this.redisClient.set(
+      `user_posts:${userId}`,
+      JSON.stringify(posts),
+      "EX",
+      3600,
+    );
+
+    return posts;
+  }
 }
