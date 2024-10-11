@@ -1,6 +1,7 @@
 import Redis from "ioredis";
 import AppDataSource from "../datasource";
 import { User } from "../entities/user.entity";
+import { NotFoundError } from "../exceptions/notFoundError";
 
 export class UserService {
   private redisClient: Redis;
@@ -23,5 +24,26 @@ export class UserService {
 
     await this.redisClient.set(cacheKey, JSON.stringify(users), "EX", 3600);
     return users;
+  }
+
+  public async getUserById(id: string): Promise<User> {
+    const cacheKey = `user_${id}`;
+    const cachedUser = await this.redisClient.get(cacheKey);
+
+    if (cachedUser) {
+      return JSON.parse(cachedUser);
+    }
+
+    const user = await AppDataSource.getRepository(User).findOne({
+      where: { id },
+      select: ["id", "first_name", "last_name", "email"],
+    });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    await this.redisClient.set(cacheKey, JSON.stringify(user), "EX", 3600);
+    return user;
   }
 }

@@ -13,3 +13,12 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
     data: { users },
   });
 });
+
+export const getUserById = asyncHandler(async (req: Request, res: Response) => {
+  const user = await userService.getUserById(req.params.id);
+  res.status(200).json({
+    status: "success",
+    message: "User fetched successfully",
+    data: { user },
+  });
+});
