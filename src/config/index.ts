@@ -10,6 +10,12 @@ const config = {
   DB_PORT: process.env.DB_PORT,
   DB_PASSWORD: process.env.DB_PASSWORD,
   DB_NAME: process.env.DB_NAME,
+
+  accessTokenTtl: process.env.ACCESS_TOKEN_TTL,
+  accessTokenPublicKey: process.env.ACCESS_TOKEN_PUBLIC_KEY,
+  accessTokenPrivateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY,
+
+  redisUrl: process.env.REDIS_URL,
 };
 
 export default config;

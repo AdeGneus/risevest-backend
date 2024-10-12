@@ -12,6 +12,7 @@ const config: Config = {
       },
     ],
   },
+  modulePathIgnorePatterns: ["<rootDir>/build/"],
 };
 
 export default config;

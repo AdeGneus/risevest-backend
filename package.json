@@ -15,7 +15,8 @@
     "migration:generate": "typeorm-ts-node-commonjs migration:generate src/migrations/migration -d src/datasource",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/datasource",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/datasource",
-    "reset-db": "NODE_ENV=development typeorm-ts-node-commonjs schema:drop -d src/datasource && typeorm-ts-node-commonjs schema:sync -d src/datasource"
+    "reset-db": "NODE_ENV=development typeorm-ts-node-commonjs schema:drop -d src/datasource && typeorm-ts-node-commonjs schema:sync -d src/datasource",
+    "test": "jest --detectOpenHandles --forceExit "
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,7 @@
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "pg": "^8.13.0",
