@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import Redis from "ioredis";
+import config from "../config";
 import asyncHandler from "../middlewares/asyncHandler";
 import { PostService } from "../services/post.service";
 
-const redisClient = new Redis();
+const redisClient = new Redis(config["redisUrl"] || "redis://localhost:6379");
 const postService = new PostService(redisClient);
 
 export const createPost = asyncHandler(async (req: Request, res: Response) => {

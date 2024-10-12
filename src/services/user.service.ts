@@ -1,4 +1,5 @@
 import Redis from "ioredis";
+import config from "../config";
 import AppDataSource from "../datasource";
 import { User } from "../entities/user.entity";
 import { NotFoundError } from "../exceptions/notFoundError";
@@ -7,7 +8,8 @@ export class UserService {
   private redisClient: Redis;
 
   constructor(redisClient?: Redis) {
-    this.redisClient = redisClient || new Redis();
+    const redisUrl = config["redisUrl"] || "redis://localhost:6379";
+    this.redisClient = redisClient || new Redis(redisUrl);
   }
 
   public async getAllUsers(): Promise<User[]> {

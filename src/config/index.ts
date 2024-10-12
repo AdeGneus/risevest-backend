@@ -14,6 +14,8 @@ const config = {
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL,
   accessTokenPublicKey: process.env.ACCESS_TOKEN_PUBLIC_KEY,
   accessTokenPrivateKey: process.env.ACCESS_TOKEN_PRIVATE_KEY,
+
+  redisUrl: process.env.REDIS_URL,
 };
 
 export default config;
