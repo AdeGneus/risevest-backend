@@ -4,11 +4,13 @@ WORKDIR /app
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --production
+RUN yarn install
 
 COPY . .
 
 RUN yarn build
+
+RUN yarn install --production
 
 EXPOSE 8123
 
